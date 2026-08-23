@@ -1,0 +1,19 @@
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text
+from sqlalchemy.orm import relationship
+from db import Base
+
+class CampaignTask(Base):
+    __tablename__ = "campaign_tasks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    campaign_id = Column(Integer, ForeignKey("campaigns.id"), nullable=False)
+    title = Column(String(150), nullable=False)
+    description = Column(Text, nullable=True)
+    assignee_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    status = Column(String(20), default="TODO", nullable=False)
+    priority = Column(String(20), default="MEDIUM", nullable=False)
+    due_date = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, nullable=False)
+
+    campaign = relationship("Campaign", back_populates="tasks")
+    assignee = relationship("User", back_populates="assigned_tasks")
