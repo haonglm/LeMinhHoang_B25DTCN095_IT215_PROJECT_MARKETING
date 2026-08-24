@@ -1,18 +1,18 @@
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel
+from typing import Optional, Literal
+from pydantic import BaseModel, Field
 
 #schema chiến dịch
 class CampaignBase(BaseModel):
-    name: str 
-    description: Optional[str] = None
+    name: str = Field(..., min_length=1, max_length=150)
+    description: Optional[str] = Field(None, max_length=1000)
 
 class CampaignCreate(CampaignBase):
     pass
 
-class campaignUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
+class CampaignUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=150)
+    description: Optional[str] = Field(None, max_length=1000)
 
 class CampaignResponse(CampaignBase):
     id: int
@@ -24,14 +24,14 @@ class CampaignResponse(CampaignBase):
 
 # schema cho thành viên chiến dịch
 class CampaignMemberBase(BaseModel):
-    user_id: int
-    role: Optional[str] = "MEMBER"
+    user_id: int = Field(..., gt=0)
+    role: Optional[Literal["OWNER", "MEMBER"]] = "MEMBER"
 
 class CampaignMemberCreate(CampaignMemberBase):
     pass
 
 class CampaignMemberUpdate(BaseModel):
-    role: str
+    role: Literal["OWNER", "MEMBER"]
 
 class CampaignMemberResponse(CampaignMemberBase):
     campaign_id: int

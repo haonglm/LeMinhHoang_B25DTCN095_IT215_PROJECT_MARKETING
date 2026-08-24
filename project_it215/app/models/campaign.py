@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
+from datetime import datetime, timezone
 from sqlalchemy.orm import relationship
 from db import Base
 
@@ -9,7 +10,7 @@ class Campaign(Base):
     name = Column(String(150), nullable=False)
     description = Column(Text, nullable=False)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     owner = relationship("User", back_populates="owned_campaigns")
 
@@ -25,7 +26,7 @@ class CampaignMember(Base):
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
 
     role = Column(String(20), default="MEMBER", nullable=False)
-    joined_at = Column(DateTime, nullable=False)
+    joined_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     campaign = relationship("Campaign", back_populates="members")
 

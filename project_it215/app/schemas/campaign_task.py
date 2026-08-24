@@ -1,14 +1,14 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal
 from pydantic import BaseModel, Field
 
 #schema cơ bản 
 class CampaignTaskBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=150)
-    description: Optional[str] = None
-    assignee_id: Optional[int] = None
-    status: Optional[str] = "TODO" #todo/in_progress/done
-    priority: Optional[str] = "MEDIUM" #low/medium/high
+    description: Optional[str] = Field(None, max_length=1000)
+    assignee_id: Optional[int] = ()
+    status: Optional[Literal["TODO", "IN_PROGRESS", "DONE"]] = "TODO" #todo/in_progress/done
+    priority: Optional[Literal["LOW", "MEDIUM", "HIGH"]] = "MEDIUM" #low/medium/high
 
 # khi tạo mới task 
 class CampaignTaskCreate(CampaignTaskBase):
@@ -16,11 +16,11 @@ class CampaignTaskCreate(CampaignTaskBase):
 
 #khi cập nhật task
 class CampaignTaskUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    assignee_id: Optional[int] = None
-    status: Optional[str] = None
-    priority: Optional[str] = None
+    title: Optional[str] = Field(None, min_length=1, max_length=150)
+    description: Optional[str] = Field(None, max_length=1000)
+    assignee_id: Optional[int] = Field(None, gt=0)
+    status: Optional[Literal["TODO", "IN_PROGRESS", "DONE"]] = None
+    priority: Optional[Literal["LOW", "MEDIUM", "HIGH"]] = None
     duedate: Optional[datetime] = None
 
 # dữ liệu trả về kết quả việc

@@ -1,7 +1,7 @@
 from fastapi import FastAPI , Request, status, HTTPException
 from fastapi.responses import JSONResponse
 
-from routers import auth, users
+from routers import auth, users, campaign
 from db import engine, Base
 import models
 
@@ -37,3 +37,4 @@ def custom_http_exception_handle(request: Request, exc: HTTPException):
 
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(campaign.router)
