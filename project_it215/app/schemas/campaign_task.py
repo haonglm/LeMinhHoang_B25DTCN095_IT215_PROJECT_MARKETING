@@ -6,9 +6,10 @@ from pydantic import BaseModel, Field
 class CampaignTaskBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=150)
     description: Optional[str] = Field(None, max_length=1000)
-    assignee_id: Optional[int] = ()
-    status: Optional[Literal["TODO", "IN_PROGRESS", "DONE"]] = "TODO" #todo/in_progress/done
-    priority: Optional[Literal["LOW", "MEDIUM", "HIGH"]] = "MEDIUM" #low/medium/high
+    assignee_id: Optional[int] = Field(None, gt=0)
+    status: Optional[Literal["TODO", "IN_PROGRESS", "DONE"]] = "TODO" 
+    priority: Optional[Literal["LOW", "MEDIUM", "HIGH"]] = "MEDIUM" 
+    due_date: Optional[datetime] = None
 
 # khi tạo mới task 
 class CampaignTaskCreate(CampaignTaskBase):
@@ -21,7 +22,7 @@ class CampaignTaskUpdate(BaseModel):
     assignee_id: Optional[int] = Field(None, gt=0)
     status: Optional[Literal["TODO", "IN_PROGRESS", "DONE"]] = None
     priority: Optional[Literal["LOW", "MEDIUM", "HIGH"]] = None
-    duedate: Optional[datetime] = None
+    due_date: Optional[datetime] = None
 
 # dữ liệu trả về kết quả việc
 class CampaignTaskResponse(CampaignTaskBase):
