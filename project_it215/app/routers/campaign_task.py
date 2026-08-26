@@ -3,29 +3,43 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from db.database import get_db
-from models import CampaignTask
+from models import CampaignTask, User
 from schemas import CampaignTaskCreate, CampaignTaskUpdate, CampaignTaskResponse
+from dependencies.auth import get_current_user
 from dependencies.campaign import check_campaign_member
-from dependencies.campaign_task import check_task_member_access, check_task_modify_permission, check_task_delete_permission
-
+from dependencies.campaign_task import check_task_member_access, check_task_delete_permission
 from services import campaign_task as task_service
 
 router = APIRouter(tags=["Campaign Tasks"])
 
 
 # Tạo đầu việc
-@router.post("/campaigns/{campaign_id}/campaign-tasks", response_model=CampaignTaskResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/campaigns/{campaign_id}/campaign-tasks",
+    response_model=CampaignTaskResponse,
+    status_code=status.HTTP_201_CREATED
+)
 def create_task(
     campaign_id: int,
     task_in: CampaignTaskCreate,
     _member=Depends(check_campaign_member),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    return task_service.create_task(campaign_id, task_in, db)
+    return task_service.create_task(
+        campaign_id=campaign_id,
+        task_in=task_in,
+        user_id=current_user.id,
+        db=db
+    )
 
 
-# Danh sách đầu việc
-@router.get("/campaigns/{campaign_id}/campaign-tasks", response_model=List[CampaignTaskResponse], status_code=status.HTTP_200_OK)
+# Danh sách đầu việc kèm phân trang & lọc
+@router.get(
+    "/campaigns/{campaign_id}/campaign-tasks",
+    response_model=List[CampaignTaskResponse],
+    status_code=status.HTTP_200_OK
+)
 def get_campaign_tasks(
     campaign_id: int,
     title: Optional[str] = Query(None, description="Tìm theo tiêu đề"),
@@ -52,19 +66,48 @@ def get_campaign_tasks(
 
 
 # Chi tiết đầu việc
-@router.get("/campaign-tasks/{task_id}", response_model=CampaignTaskResponse, status_code=status.HTTP_200_OK)
+@router.get(
+    "/campaign-tasks/{task_id}",
+    response_model=CampaignTaskResponse,
+    status_code=status.HTTP_200_OK
+)
 def get_task_detail(task: CampaignTask = Depends(check_task_member_access)):
     return task
 
 
 # Cập nhật đầu việc
-@router.patch("/campaign-tasks/{task_id}", response_model=CampaignTaskResponse, status_code=status.HTTP_200_OK)
-def update_task(task_in: CampaignTaskUpdate, task: CampaignTask = Depends(check_task_modify_permission), db: Session = Depends(get_db)):
-    return task_service.update_task(task, task_in, db)
+@router.patch(
+    "/campaign-tasks/{task_id}",
+    response_model=CampaignTaskResponse,
+    status_code=status.HTTP_200_OK
+)
+def update_task(
+    task_in: CampaignTaskUpdate,
+    task: CampaignTask = Depends(check_task_member_access),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return task_service.update_task(
+        task=task,
+        task_in=task_in,
+        user_id=current_user.id,
+        db=db
+    )
 
 
 # Xóa đầu việc
-@router.delete("/campaign-tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_task( task: CampaignTask = Depends(check_task_delete_permission), db: Session = Depends(get_db)):
-    task_service.delete_task(task, db)
+@router.delete(
+    "/campaign-tasks/{task_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_task(
+    task: CampaignTask = Depends(check_task_delete_permission),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    task_service.delete_task(
+        task=task,
+        user_id=current_user.id,
+        db=db
+    )
     return None

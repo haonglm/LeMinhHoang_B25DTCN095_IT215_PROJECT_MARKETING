@@ -1,7 +1,7 @@
 from fastapi import FastAPI , Request, status, HTTPException
 from fastapi.responses import JSONResponse
 
-from routers import auth, users, campaign, campaign_task
+from routers import auth, users, campaign, campaign_task, comment, activity_log
 from db import engine, Base
 import models
 
@@ -39,3 +39,5 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(campaign.router)
 app.include_router(campaign_task.router)
+app.include_router(comment.router)
+app.include_router(activity_log.router)
