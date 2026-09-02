@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
 
-# Schema khi TẠO MỚI task (KHÔNG có assignee_id)
+# Schema khi tạo mới task 
 class CampaignTaskCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=150)
     description: Optional[str] = Field(None, max_length=1000)
@@ -11,7 +11,7 @@ class CampaignTaskCreate(BaseModel):
     due_date: Optional[datetime] = None
 
 
-# Schema khi CẬP NHẬT task (Chứa tất cả các trường có thể sửa)
+# Schema khi cập nhật task
 class CampaignTaskUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=150)
     description: Optional[str] = Field(None, max_length=1000)
@@ -21,7 +21,7 @@ class CampaignTaskUpdate(BaseModel):
     assignee_id: Optional[int] = Field(None, gt=0)
 
 
-# Schema TRẢ VỀ kết quả 
+# Schema trả kết quả 
 class CampaignTaskResponse(BaseModel):
     id: int
     campaign_id: int

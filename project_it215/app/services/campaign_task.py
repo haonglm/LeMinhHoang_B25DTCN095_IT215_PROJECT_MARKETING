@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -7,7 +7,7 @@ from schemas import CampaignTaskCreate, CampaignTaskUpdate
 from services import activity_log as log_service
 
 
-def create_task(campaign_id: int, task_in: CampaignTaskCreate, user_id: int, db: Session) -> CampaignTask:
+def create_task(campaign_id: int, task_in: CampaignTaskCreate, user_id: int, db: Session):
     new_task = CampaignTask(
         campaign_id=campaign_id,
         title=task_in.title,
@@ -21,7 +21,7 @@ def create_task(campaign_id: int, task_in: CampaignTaskCreate, user_id: int, db:
     db.commit()
     db.refresh(new_task)
 
-    # 6. LOG TẠO TASK
+    # LOG TẠO TASK
     log_service.log_action(campaign_id, user_id, "CREATE_TASK", db)
 
     return new_task
@@ -37,7 +37,7 @@ def get_campaign_tasks(
     sort_by: Optional[str] = "created_at",
     page: int = 1,
     size: int = 10
-) -> List[CampaignTask]:
+):
     query = db.query(CampaignTask).filter(CampaignTask.campaign_id == campaign_id)
 
     if title:
@@ -58,7 +58,7 @@ def get_campaign_tasks(
     return query.offset(offset).limit(size).all()
 
 
-def update_task(task: CampaignTask, task_in: CampaignTaskUpdate, user_id: int, db: Session) -> CampaignTask:
+def update_task(task: CampaignTask, task_in: CampaignTaskUpdate, user_id: int, db: Session):
     update_data = task_in.model_dump(exclude_unset=True)
 
     campaign = db.query(Campaign).filter(Campaign.id == task.campaign_id).first()
@@ -93,7 +93,7 @@ def update_task(task: CampaignTask, task_in: CampaignTaskUpdate, user_id: int, d
     db.commit()
     db.refresh(task)
 
-    # 7. LOG SỬA TASK
+    # LOG SỬA TASK
     log_service.log_action(task.campaign_id, user_id, "UPDATE_TASK", db)
 
     return task
@@ -104,5 +104,5 @@ def delete_task(task: CampaignTask, user_id: int, db: Session):
     db.delete(task)
     db.commit()
 
-    # 8. LOG XÓA TASK
+    # LOG XÓA TASK
     log_service.log_action(campaign_id, user_id, "DELETE_TASK", db)

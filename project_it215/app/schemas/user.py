@@ -9,6 +9,10 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str = Field(..., min_length=6, max_length=100)
 
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=6, max_length=100)
+
 class UserUpdate(BaseModel):
     full_name: Optional[str] = Field(None, min_length=2, max_length=100)
     role: Optional[Literal["ADMIN", "USER"]] = None

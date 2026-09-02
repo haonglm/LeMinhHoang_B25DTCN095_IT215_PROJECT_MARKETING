@@ -11,12 +11,12 @@ def handle_hash_pass(plain_pass: str):
 def verify_pass(plain_pass: str, hash_pass: str):
     return bcrypt.checkpw(plain_pass.encode("utf-8"), hash_pass.encode("utf-8"))
 
-def handle_access_token(user_name: str, email:str, role: str):
+def handle_access_token(email: str, role: str, full_name: str = ""):
     expire_time = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     payload = {
         "sub": email,
-        "user_name": user_name,
+        "full_name": full_name,
         "role": role,
         "exp": expire_time
     }

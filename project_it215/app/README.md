@@ -1,1 +1,0 @@
-LONG ĐẠI CA
